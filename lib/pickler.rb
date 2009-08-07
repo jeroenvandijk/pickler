@@ -22,6 +22,7 @@ class Pickler
   end
 
   attr_reader :directory
+  attr_writer :lang, :trace
 
   def initialize(path = '.')
     @lang = 'en'
@@ -82,10 +83,22 @@ class Pickler
     project.deliver_all_finished_stories
   end
 
-  def parser
+  def language
     require 'cucumber'
-    Cucumber.load_language(@lang)
-    @parser ||= Cucumber::Parser::FeatureParser.new
+    
+    @language ||= Cucumber::Parser::I18n::Language[@lang]
+  end
+
+  def parser
+    @parser ||= language.parser
+  end
+  
+  def parse(story)
+    parser.parse_or_fail(story.to_s)
+  rescue StandardError => e
+    puts "Feature '#{story.name}' has not been recognized as a valid cucumber story given locale '#{@lang}' \n\t\t => #{e.inspect}\n" if @trace
+    
+    false
   end
 
   def project_id
@@ -106,8 +119,7 @@ class Pickler
   end
 
   def scenario_word
-    parser
-    Cucumber.keyword_hash['scenario']
+    language.scenario_keyword
   end
 
   def format
@@ -119,10 +131,10 @@ class Pickler
   end
 
   def scenario_features(excluded_states = %w(unscheduled unstarted))
-    project.stories(scenario_word, :includedone => true).reject do |s|
-      Array(excluded_states).map {|s| s.to_s}.include?(s.current_state)
+    project.stories(scenario_word, :includedone => true).reject do |story|
+      Array(excluded_states).map {|s| s.to_s}.include?(story.current_state)
     end.select do |s|
-      s.to_s =~ /^\s*#{Regexp.escape(scenario_word)}:/ && parser.parse(s.to_s)
+      s.to_s =~ /^\s*#{Regexp.escape(scenario_word)}/ && parse(s)
     end
   end
 

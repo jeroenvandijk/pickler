@@ -29,7 +29,7 @@ class Pickler
         options << args
         define_method("option_#{args.object_id}", &block)
       end
-
+      
       def self.banner_arguments(value = nil)
         if value
           @banner_arguments = value
@@ -318,6 +318,14 @@ Download the given story or all well formed stories to the features/ directory.
 Previously unseen stories will be given a numeric filename that you are
 encouraged to change.
       EOF
+
+      on "--language=lang", "sets the language, defaults to 'en'" do |lang|
+        pickler.lang = lang
+      end
+      
+      on "--trace", "Gives feedback when features are not valid" do
+        pickler.trace = true
+      end
 
       process do |*args|
         args.replace(pickler.scenario_features) if args.empty?
