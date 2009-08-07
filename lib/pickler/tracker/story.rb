@@ -8,7 +8,7 @@ class Pickler
       attr_reader :project, :labels
       reader :url
       date_reader :created_at, :accepted_at, :deadline
-      accessor :current_state, :name, :description, :owned_by, :requested_by, :story_type
+      accessor :current_state, :name, :description, :owned_by, :requested_by, :story_type, :language
 
       def initialize(project, attributes = {})
         @project = project
@@ -92,7 +92,7 @@ class Pickler
         when :tag
           "@#{url}#{labels.map {|l| " @#{l.tr('_,',' _')}"}.join}"
         else
-          "# #{url}"
+          "# language: #{language}\n# #{url}"
         end
       end
 

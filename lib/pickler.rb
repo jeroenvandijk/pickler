@@ -21,7 +21,7 @@ class Pickler
     Runner.new(argv).run
   end
 
-  attr_reader :directory
+  attr_reader :directory, :lang
   attr_writer :lang, :trace
 
   def initialize(path = '.')

@@ -47,5 +47,12 @@ describe Pickler::Tracker::Story do
   it "should have an iteration" do
     @story.iteration.should be_kind_of(Pickler::Tracker::Iteration)
   end
+  
+  describe "#to_s" do
+    it "should include the language in the header when language is given" do
+      @story.language = "nl"
+      @story.to_s.should == "# language: nl\n# http://www.pivotaltracker.com/story/show/STORY_ID\nFeature: More power to shields\n"
+    end
+  end
 
 end

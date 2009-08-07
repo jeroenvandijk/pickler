@@ -52,6 +52,7 @@ class Pickler
     def pull(default = nil)
       filename = filename() || pickler.features_path("#{default||id}.feature")
       story = story() # force the read into local_body before File.open below blows it away
+      story.language = pickler.lang
       File.open(filename,'w') {|f| f.puts story.to_s(pickler.format)}
       @filename = filename
     end
